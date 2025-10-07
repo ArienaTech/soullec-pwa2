@@ -3,11 +3,6 @@
   publish = "dist/public"
   functions = "netlify/functions"
 
-[functions]
-  node_bundler = "esbuild"
-  directory = "netlify/functions"
-  included_files = ["netlify/functions/**"]
-
 [[redirects]]
   from = "/api/user/session"
   to = "/.netlify/functions/user-session"

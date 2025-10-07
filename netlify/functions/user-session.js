@@ -1,7 +1,6 @@
-import { Handler } from '@netlify/functions';
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
-export const handler: Handler = async (event) => {
+exports.handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -15,8 +14,8 @@ export const handler: Handler = async (event) => {
 
   try {
     const supabase = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
     const body = JSON.parse(event.body || '{}');
@@ -76,8 +75,7 @@ export const handler: Handler = async (event) => {
         isPremium: user?.subscription_status === 'premium',
       }),
     };
-  } catch (error: any) {
-    console.error('Session error:', error);
+  } catch (error) {
     return {
       statusCode: 500,
       headers,
