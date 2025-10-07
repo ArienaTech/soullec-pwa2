@@ -28,7 +28,11 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sparkles, Share2, Crown, Wand2, Settings, Stars, Zap, Calendar, Gem, LogIn, LogOut, User, Info, X, ChevronRight, Award, Heart } from "lucide-react";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || "");
+// Only initialize Stripe if we have a valid key
+const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+const stripePromise = stripePublicKey && stripePublicKey.startsWith('pk_') 
+  ? loadStripe(stripePublicKey) 
+  : null;
 
 export default function Home() {
   const [, setLocation] = useLocation();

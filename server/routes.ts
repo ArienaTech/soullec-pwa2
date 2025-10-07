@@ -8,13 +8,12 @@ import { drawCards } from "./tarot";
 import { insertMessageSchema, insertPaymentSchema } from "@shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-09-30.clover",
-});
+// Initialize Stripe only if key is provided
+const stripe = process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.startsWith('sk_')
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2025-09-30.clover",
+    })
+  : null;
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Replit Auth
