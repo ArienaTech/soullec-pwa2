@@ -1,0 +1,8 @@
+Add translations for gem packs and profile setup in Spanish
+
+Implements i18n for gem pack descriptions and profile setup fields in Spanish, and updates the Gems page component to use translation keys for dynamic content.
+
+Replit-Commit-Author: Agent
+Replit-Commit-Session-Id: 358c0501-d0ff-42f9-b3ec-94b0d976fed9
+Replit-Commit-Checkpoint-Type: full_checkpoint
+Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/8af76aa9-b47c-45c4-8511-29ebd4374a2e/358c0501-d0ff-42f9-b3ec-94b0d976fed9/plOBlsY
