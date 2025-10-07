@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Share2, Download, Copy, Check } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/lib/use-toast";
 import * as htmlToImage from "html-to-image";
 
@@ -13,7 +12,6 @@ interface ShareModalProps {
 }
 
 export default function ShareModal({ isOpen, onClose, message }: ShareModalProps) {
-  const { t } = useLanguage();
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -23,14 +21,14 @@ export default function ShareModal({ isOpen, onClose, message }: ShareModalProps
       await navigator.clipboard.writeText(message);
       setCopied(true);
       toast({
-        title: t("copied"),
-        description: t("messageCopied"),
+        title: "Copied",
+        description: "Message copied to clipboard",
       });
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       toast({
-        title: t("error"),
-        description: t("failedToCopy"),
+        title: "Error",
+        description: "Failed to copy message",
         variant: "destructive",
       });
     }
@@ -72,13 +70,13 @@ export default function ShareModal({ isOpen, onClose, message }: ShareModalProps
       link.click();
       
       toast({
-        title: t("success"),
-        description: t("imageDownloaded"),
+        title: "Success",
+        description: "Image downloaded successfully",
       });
     } catch (error) {
       toast({
-        title: t("error"),
-        description: t("failedToGenerate"),
+        title: "Error",
+        description: "Failed to generate image",
         variant: "destructive",
       });
     } finally {
@@ -92,7 +90,7 @@ export default function ShareModal({ isOpen, onClose, message }: ShareModalProps
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Share2 className="w-5 h-5" />
-            {t("shareMessage")}
+            Share Message
           </DialogTitle>
         </DialogHeader>
 
@@ -106,12 +104,12 @@ export default function ShareModal({ isOpen, onClose, message }: ShareModalProps
               {copied ? (
                 <>
                   <Check className="w-4 h-4 mr-2 text-green-500" />
-                  {t("copied")}
+                  Copied
                 </>
               ) : (
                 <>
                   <Copy className="w-4 h-4 mr-2" />
-                  {t("copyText")}
+                  Copy Text
                 </>
               )}
             </Button>
@@ -124,12 +122,12 @@ export default function ShareModal({ isOpen, onClose, message }: ShareModalProps
               {isGenerating ? (
                 <>
                   <Download className="w-4 h-4 mr-2 animate-spin" />
-                  {t("generating")}
+                  Generating...
                 </>
               ) : (
                 <>
                   <Download className="w-4 h-4 mr-2" />
-                  {t("downloadImage")}
+                  Download Image
                 </>
               )}
             </Button>

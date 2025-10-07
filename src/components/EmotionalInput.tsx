@@ -24,11 +24,11 @@ export default function EmotionalInput({ onSubmit, isLoading }: EmotionalInputPr
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <label htmlFor="feeling" className="text-lg font-medium text-foreground">
-          {t("whatAreYouFeeling")}
+          {t("heroTitle")}
         </label>
         <Textarea
           id="feeling"
-          placeholder={t("shareYourThoughts")}
+          placeholder={t("emotionalInputPlaceholder")}
           value={feeling}
           onChange={(e) => setFeeling(e.target.value)}
           className="min-h-[120px] resize-none text-base"
@@ -43,12 +43,12 @@ export default function EmotionalInput({ onSubmit, isLoading }: EmotionalInputPr
         {isLoading ? (
           <>
             <Sparkles className="w-4 h-4 mr-2 animate-spin" />
-            {t("generating")}
+            {t("channeling")}
           </>
         ) : (
           <>
             <Sparkles className="w-4 h-4 mr-2" />
-            {t("getMyMessage")}
+            {t("receiveYourMessage")}
           </>
         )}
       </Button>

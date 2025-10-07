@@ -1,13 +1,22 @@
-import { ThemeProvider } from '../ThemeProvider';
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 
-export default function ThemeProviderExample() {
+interface ThemeProviderProps {
+  children: React.ReactNode;
+  [key: string]: any;
+}
+
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
-    <ThemeProvider>
-      <div className="p-8 space-y-4">
-        <div className="p-6 bg-card rounded-lg">
-          <p className="text-foreground">Theme provider is active. Toggle between light and dark modes.</p>
-        </div>
-      </div>
-    </ThemeProvider>
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="dark"
+      enableSystem={true}
+      disableTransitionOnChange={true}
+      {...props}
+    >
+      {children}
+    </NextThemesProvider>
   );
 }
+
+export default ThemeProvider;

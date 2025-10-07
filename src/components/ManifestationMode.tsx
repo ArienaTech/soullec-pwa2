@@ -28,11 +28,11 @@ export default function ManifestationMode({ onGenerate, affirmation, isLoading }
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <label htmlFor="desire" className="text-lg font-medium text-foreground">
-            {t("whatDoYouWantToManifest")}
+            {t("manifestationSubtitle")}
           </label>
           <Textarea
             id="desire"
-            placeholder={t("describeYourDesire")}
+            placeholder={t("manifestationPlaceholder")}
             value={desire}
             onChange={(e) => setDesire(e.target.value)}
             className="min-h-[120px] resize-none text-base"
@@ -47,7 +47,7 @@ export default function ManifestationMode({ onGenerate, affirmation, isLoading }
           {isLoading ? (
             <>
               <Sparkles className="w-4 h-4 mr-2 animate-spin" />
-              {t("manifesting")}
+              {t("creating")}
             </>
           ) : (
             <>
@@ -74,7 +74,7 @@ export default function ManifestationMode({ onGenerate, affirmation, isLoading }
               </p>
               <div className="mt-6">
                 <span className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
-                  {t("affirmation")}
+                  {t("manifestationMode")}
                 </span>
               </div>
             </div>

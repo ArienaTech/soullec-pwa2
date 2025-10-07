@@ -2,8 +2,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Crown, Gem, Check, X } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
-
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -12,7 +10,6 @@ interface PaymentModalProps {
 }
 
 export default function PaymentModal({ isOpen, onClose, type, onCheckout }: PaymentModalProps) {
-  const { t } = useLanguage();
 
   const handleCheckout = () => {
     onCheckout(type);
@@ -27,12 +24,12 @@ export default function PaymentModal({ isOpen, onClose, type, onCheckout }: Paym
             {type === "subscription" ? (
               <>
                 <Crown className="w-5 h-5 text-yellow-500" />
-                {t("premiumSubscription")}
+                Premium Subscription
               </>
             ) : (
               <>
                 <Gem className="w-5 h-5 text-purple-500" />
-                {t("unlockReading")}
+                Unlock Reading
               </>
             )}
           </DialogTitle>
@@ -50,25 +47,25 @@ export default function PaymentModal({ isOpen, onClose, type, onCheckout }: Paym
                     $9.99/month
                   </h3>
                   <p className="text-sm text-yellow-600 dark:text-yellow-400">
-                    {t("unlimitedAccess")}
+                    Unlimited Access
                   </p>
                 </div>
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-green-500" />
-                    {t("unlimitedMessages")}
+                    Unlimited Messages
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-green-500" />
-                    {t("unlimitedTarot")}
+                    Unlimited Tarot
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-green-500" />
-                    {t("unlimitedHoroscopes")}
+                    Unlimited Horoscopes
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-green-500" />
-                    {t("premiumSupport")}
+                    Premium Support
                   </li>
                 </ul>
               </div>
@@ -84,11 +81,11 @@ export default function PaymentModal({ isOpen, onClose, type, onCheckout }: Paym
                     $1.99
                   </h3>
                   <p className="text-sm text-purple-600 dark:text-purple-400">
-                    {t("oneTimeUnlock")}
+                    One Time Unlock
                   </p>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {t("unlockDeeperInsight")}
+                  Unlock deeper insight
                 </p>
               </div>
             </Card>
@@ -97,18 +94,18 @@ export default function PaymentModal({ isOpen, onClose, type, onCheckout }: Paym
           <div className="flex gap-3">
             <Button variant="outline" onClick={onClose} className="flex-1">
               <X className="w-4 h-4 mr-2" />
-              {t("cancel")}
+              Cancel
             </Button>
             <Button onClick={handleCheckout} className="flex-1">
               {type === "subscription" ? (
                 <>
                   <Crown className="w-4 h-4 mr-2" />
-                  {t("subscribe")}
+                  Subscribe
                 </>
               ) : (
                 <>
                   <Gem className="w-4 h-4 mr-2" />
-                  {t("unlock")}
+                  Unlock
                 </>
               )}
             </Button>
