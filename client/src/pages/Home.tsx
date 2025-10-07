@@ -739,62 +739,6 @@ export default function Home() {
               </div>
             )}
 
-            {tarotReading && (
-              <div className="mt-8 p-6 bg-gradient-to-br from-card via-card to-purple-900/5 border border-primary/30 rounded-lg shadow-lg">
-                <div className="mb-6">
-                  <h3 className="text-xl font-serif font-bold mb-2 flex items-center gap-2">
-                    <Zap className="w-6 h-6 text-primary" />
-                    {t("tarotReading")}
-                  </h3>
-                  <p className="text-sm text-muted-foreground italic">
-                    "{tarotQuestion}"
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap justify-center gap-4 mb-6">
-                  {tarotReading.cards?.map((cardData: any, index: number) => (
-                    <TarotCard 
-                      key={index}
-                      card={cardData}
-                      index={index}
-                      isRevealed={true}
-                    />
-                  ))}
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold text-primary mb-2">
-                      {t("tarotInterpretation")}
-                    </h4>
-                    <p className="text-foreground leading-relaxed whitespace-pre-wrap">
-                      {tarotReading.reading}
-                    </p>
-                  </div>
-
-                  {tarotReading.advice && (
-                    <div>
-                      <h4 className="font-semibold text-primary mb-2">
-                        {t("tarotGuidance")}
-                      </h4>
-                      <p className="text-foreground leading-relaxed whitespace-pre-wrap">
-                        {tarotReading.advice}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setTarotReading(null)}
-                  className="mt-6"
-                  data-testid="button-close-tarot"
-                >
-                  {t("close")}
-                </Button>
-              </div>
-            )}
           </div>
         )}
 

@@ -16,11 +16,6 @@ interface AffirmationResponse {
   affirmation: string;
 }
 
-interface TarotInterpretation {
-  reading: string;
-  advice: string;
-}
-
 export async function detectEmotion(text: string): Promise<EmotionAnalysis> {
   try {
     const response = await openai.chat.completions.create({
