@@ -3,7 +3,7 @@ import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-
 import { loadStripe } from "@stripe/stripe-js";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/lib/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { Sparkles, ArrowLeft } from "lucide-react";

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/lib/use-toast";
+import { useAuth } from "@/lib/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { loadStripe } from "@stripe/stripe-js";
 import EmotionalInput from "@/components/EmotionalInput";

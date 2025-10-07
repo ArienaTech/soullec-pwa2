@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/lib/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Gem, Crown, ArrowLeft, Sparkles, Check, Copy, Gift, Users } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";

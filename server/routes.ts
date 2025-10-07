@@ -1,12 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
-import { storage } from "./storage";
-import { detectEmotion, generateBarnumMessage, generateAffirmation, generateDailyHoroscope, generateTarotReading } from "./openai";
-import { calculateHoroscope, formatHoroscopeContext } from "./horoscope";
-import { drawCards } from "./tarot";
-import { insertMessageSchema, insertPaymentSchema } from "@shared/schema";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { storage } from "../src/lib/storage";
+import { detectEmotion, generateBarnumMessage, generateAffirmation, generateDailyHoroscope, generateTarotReading } from "./lib/openai";
+import { calculateHoroscope, formatHoroscopeContext } from "./lib/horoscope";
+import { drawCards } from "./lib/tarot";
+import { insertMessageSchema, insertPaymentSchema } from "./lib/schema";
+import { setupAuth, isAuthenticated } from "./lib/replitAuth";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
