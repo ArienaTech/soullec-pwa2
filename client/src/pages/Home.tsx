@@ -13,7 +13,6 @@ import ShareModal from "@/components/ShareModal";
 import StreakBadge from "@/components/StreakBadge";
 import ThemeToggle from "@/components/ThemeToggle";
 import LanguageSelector from "@/components/LanguageSelector";
-import TarotCard from "@/components/TarotCard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Dialog,
@@ -58,11 +57,6 @@ export default function Home() {
   const [horoscopeQuestion, setHoroscopeQuestion] = useState("");
   const [horoscopeDate, setHoroscopeDate] = useState("");
   const [lastHoroscopePeriod, setLastHoroscopePeriod] = useState<"daily" | "monthly" | "yearly" | "specific">("daily");
-  const [tarotReading, setTarotReading] = useState<any>(null);
-  const [loadingTarot, setLoadingTarot] = useState(false);
-  const [tarotQuestion, setTarotQuestion] = useState("");
-  const [showTarotDialog, setShowTarotDialog] = useState(false);
-  const [tarotQuestionInput, setTarotQuestionInput] = useState("");
   const [userProfile, setUserProfile] = useState<any>(null);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [profileBannerDismissed, setProfileBannerDismissed] = useState(false);
@@ -209,50 +203,6 @@ export default function Home() {
     fetchUserProfile();
   }, [userId]);
 
-  // Auto-translate tarot reading when language changes
-  useEffect(() => {
-    const translateTarotReading = async () => {
-      if (!tarotReading || !tarotQuestion) return;
-
-      const languageMap: Record<string, string> = {
-        en: "English",
-        es: "Spanish",
-        pt: "Portuguese",
-        th: "Thai",
-        zh: "Chinese (Simplified)",
-        ja: "Japanese",
-        ko: "Korean",
-        fr: "French",
-        de: "German",
-        it: "Italian",
-        hi: "Hindi",
-      };
-
-      try {
-        const response = await apiRequest("POST", "/api/tarot/translate", {
-          question: tarotQuestion,
-          cards: tarotReading.cards,
-          spread: tarotReading.spread,
-          uiLanguage: languageMap[language] || "English",
-          userId: userId,
-        });
-
-        const data = await response.json();
-        
-        if (data.reading && data.advice) {
-          setTarotReading({
-            ...tarotReading,
-            reading: data.reading,
-            advice: data.advice,
-          });
-        }
-      } catch (error) {
-        console.error("Translation error:", error);
-      }
-    };
-
-    translateTarotReading();
-  }, [language, userId]);
   
   // Profile completion helpers
   const isProfileComplete = userProfile?.birthDate && userProfile?.horoscopePreferences?.length > 0;
@@ -470,76 +420,6 @@ export default function Home() {
     }
   };
 
-  const handleTarotDialogOpen = () => {
-    if (!userId) {
-      toast({
-        title: t("error"),
-        description: t("sessionNotInitialized"),
-        variant: "destructive",
-      });
-      return;
-    }
-    setShowTarotDialog(true);
-    setTarotQuestionInput("");
-  };
-
-  const handleTarotReading = async () => {
-    if (!tarotQuestionInput.trim()) {
-      toast({
-        title: t("error"),
-        description: t("enterQuestion"),
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setShowTarotDialog(false);
-    setLoadingTarot(true);
-    setTarotQuestion(tarotQuestionInput);
-
-    try {
-      const uiLanguage = localStorage.getItem("manifestly-ui-language") || "en";
-      const languageMap: Record<string, string> = {
-        en: "English",
-        es: "Spanish",
-        pt: "Portuguese",
-        th: "Thai",
-        zh: "Chinese (Simplified)",
-        ja: "Japanese",
-        ko: "Korean",
-        fr: "French",
-        de: "German",
-        it: "Italian",
-        hi: "Hindi",
-      };
-
-      const response = await apiRequest("POST", "/api/tarot/reading", {
-        question: tarotQuestionInput,
-        userId,
-        uiLanguage: languageMap[uiLanguage] || "English",
-        numCards: 3,
-      });
-
-      const data = await response.json();
-
-      if (data.reading) {
-        setTarotReading(data);
-        if (typeof data.soulGems === 'number') {
-          setSoulGems(data.soulGems);
-        }
-      } else {
-        throw new Error("No tarot reading received");
-      }
-    } catch (error: any) {
-      toast({
-        title: t("error"),
-        description: error.message || "Failed to generate tarot reading. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoadingTarot(false);
-    }
-  };
 
   const handleCheckout = async (type: "unlock" | "subscription") => {
     if (!userId) {
@@ -762,54 +642,7 @@ export default function Home() {
                 {loadingHoroscope ? t("readingStars") : t("horoscopeReading")}
               </Button>
 
-              <Button
-                onClick={handleTarotDialogOpen}
-                variant="outline"
-                className="h-12 px-8"
-                disabled={loadingTarot}
-                data-testid="button-tarot-reading"
-              >
-                <Zap className="w-5 h-5 mr-2" />
-                {loadingTarot ? t("readingCards") : t("tarotReading")}
-              </Button>
             </div>
-
-            <Dialog open={showTarotDialog} onOpenChange={setShowTarotDialog}>
-              <DialogContent data-testid="dialog-tarot-question">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-primary" />
-                    {t("askTarot")}
-                  </DialogTitle>
-                  <DialogDescription>
-                    {t("tarotQuestion")}
-                  </DialogDescription>
-                </DialogHeader>
-                <Textarea
-                  placeholder={t("tarotQuestionPlaceholder")}
-                  value={tarotQuestionInput}
-                  onChange={(e) => setTarotQuestionInput(e.target.value)}
-                  className="min-h-24"
-                  data-testid="input-tarot-question"
-                />
-                <DialogFooter>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowTarotDialog(false)}
-                    data-testid="button-cancel-tarot"
-                  >
-                    {t("close")}
-                  </Button>
-                  <Button 
-                    onClick={handleTarotReading}
-                    data-testid="button-submit-tarot"
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    {t("drawCards")}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
 
             <Dialog open={showHoroscopeDialog} onOpenChange={setShowHoroscopeDialog}>
               <DialogContent data-testid="dialog-horoscope-reading">
