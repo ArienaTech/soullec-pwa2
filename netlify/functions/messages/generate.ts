@@ -29,6 +29,7 @@ async function detectEmotion(text: string): Promise<{ emotion: string; confidenc
       confidence: Math.max(0, Math.min(1, result.confidence || 0.5)),
     };
   } catch (error) {
+    console.error('Emotion detection error:', error);
     return { emotion: "uncertain", confidence: 0.5 };
   }
 }
@@ -54,10 +55,10 @@ async function generateMessage(
 
   const tone = toneMap[emotion] || "warm and deeply insightful";
 
-  let systemContent = `You are a divine oracle. Create a personalized message that is ${tone}. Use 4-5 sentences. Make it specific and actionable. Write completely in ${language}.`;
+  let systemContent = `You are a divine oracle. Create a personalized message that is ${tone}. Use 4-5 sentences. Reference their exact words. Make it specific and actionable. Write completely in ${language}.`;
 
   if (horoscopeContext) {
-    systemContent += `\n\nASTROLOGICAL CONTEXT:\n${horoscopeContext}`;
+    systemContent += `\n\nASTROLOGICAL CONTEXT (mention specific elements/animals by name):\n${horoscopeContext}`;
   }
 
   if (religion) {
@@ -125,7 +126,7 @@ export const handler: Handler = async (event) => {
     const message = await generateMessage(
       feeling,
       emotionAnalysis.emotion,
-      undefined, // TODO: Add horoscope context
+      undefined,
       user.religion || undefined,
       language
     );

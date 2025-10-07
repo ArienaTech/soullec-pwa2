@@ -7,7 +7,6 @@ const supabase = createClient(
 );
 
 export const handler: Handler = async (event) => {
-  // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -15,7 +14,6 @@ export const handler: Handler = async (event) => {
     'Content-Type': 'application/json',
   };
 
-  // Handle OPTIONS request
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
   }

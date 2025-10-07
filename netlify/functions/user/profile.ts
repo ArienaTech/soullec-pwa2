@@ -19,33 +19,6 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    // GET /api/user/profile/:userId
-    if (event.httpMethod === 'GET') {
-      const userId = event.path.split('/').pop();
-      
-      if (!userId) {
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ message: 'User ID required' }),
-        };
-      }
-
-      const { data: user, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error) throw error;
-
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(user),
-      };
-    }
-
     // POST /api/user/profile (update)
     if (event.httpMethod === 'POST') {
       const {
@@ -83,6 +56,35 @@ export const handler: Handler = async (event) => {
         statusCode: 200,
         headers,
         body: JSON.stringify({ success: true }),
+      };
+    }
+
+    // GET /api/user/profile/:userId - Handle path parameter
+    if (event.httpMethod === 'GET') {
+      // Extract userId from path: /api/user/profile/abc-123
+      const pathParts = event.path.split('/');
+      const userId = pathParts[pathParts.length - 1];
+      
+      if (!userId || userId === 'profile') {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ message: 'User ID required' }),
+        };
+      }
+
+      const { data: user, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify(user),
       };
     }
 
