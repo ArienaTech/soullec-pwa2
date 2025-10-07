@@ -575,7 +575,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <StreakBadge streak={streak} />
+      {/* <StreakBadge streak={streak} /> */}
 
       <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
