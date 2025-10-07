@@ -72,8 +72,9 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxaWVucnF
 
 **3. OPENAI_API_KEY**
 ```
-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
+YOUR_OPENAI_KEY_HERE
 ```
+(Use your OpenAI key from platform.openai.com)
 
 **⚠️ CRITICAL:**
 - No quotes around values in Netlify UI
