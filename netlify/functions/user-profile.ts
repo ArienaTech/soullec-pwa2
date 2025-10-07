@@ -1,11 +1,6 @@
 import { Handler } from '@netlify/functions';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export const handler: Handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -19,7 +14,11 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    // POST /api/user/profile (update)
+    const supabase = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
     if (event.httpMethod === 'POST') {
       const {
         userId,
@@ -59,13 +58,11 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    // GET /api/user/profile/:userId
     if (event.httpMethod === 'GET') {
-      // Extract userId from path or query
       const pathParts = event.path.split('/');
-      const userId = pathParts[pathParts.length - 1] || event.queryStringParameters?.userId;
+      const userId = pathParts[pathParts.length - 1];
       
-      if (!userId || userId === 'api-user-profile') {
+      if (!userId || userId === 'user-profile') {
         return {
           statusCode: 400,
           headers,

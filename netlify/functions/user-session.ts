@@ -1,11 +1,6 @@
 import { Handler } from '@netlify/functions';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export const handler: Handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -18,19 +13,15 @@ export const handler: Handler = async (event) => {
     return { statusCode: 200, headers, body: '' };
   }
 
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ message: 'Method not allowed' }),
-    };
-  }
-
   try {
+    const supabase = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
     const body = JSON.parse(event.body || '{}');
     let userId = body.userId;
 
-    // Create or get user
     if (!userId) {
       const { data: newUser, error } = await supabase
         .from('users')
@@ -57,7 +48,6 @@ export const handler: Handler = async (event) => {
         if (error) throw error;
         userId = newUser.id;
       } else {
-        // Refresh daily gems if needed
         const today = new Date().toISOString().split('T')[0];
         if (existingUser.last_free_gems_date !== today && existingUser.subscription_status !== 'premium') {
           await supabase
@@ -71,7 +61,6 @@ export const handler: Handler = async (event) => {
       }
     }
 
-    // Get updated user data
     const { data: user } = await supabase
       .from('users')
       .select('*')
@@ -92,7 +81,7 @@ export const handler: Handler = async (event) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ message: 'Error creating session: ' + error.message }),
+      body: JSON.stringify({ message: 'Error: ' + error.message }),
     };
   }
 };
