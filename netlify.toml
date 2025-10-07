@@ -9,10 +9,25 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# API routes go to Netlify Functions
+# API routes go to Netlify Functions (specific mappings)
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  from = "/api/user/session"
+  to = "/.netlify/functions/api-user-session"
+  status = 200
+
+[[redirects]]
+  from = "/api/user/profile/*"
+  to = "/.netlify/functions/api-user-profile"
+  status = 200
+
+[[redirects]]
+  from = "/api/user/profile"
+  to = "/.netlify/functions/api-user-profile"
+  status = 200
+
+[[redirects]]
+  from = "/api/messages/generate"
+  to = "/.netlify/functions/api-messages-generate"
   status = 200
 
 # SPA routing - all other routes serve index.html

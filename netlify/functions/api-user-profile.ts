@@ -59,13 +59,13 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    // GET /api/user/profile/:userId - Handle path parameter
+    // GET /api/user/profile/:userId
     if (event.httpMethod === 'GET') {
-      // Extract userId from path: /api/user/profile/abc-123
+      // Extract userId from path or query
       const pathParts = event.path.split('/');
-      const userId = pathParts[pathParts.length - 1];
+      const userId = pathParts[pathParts.length - 1] || event.queryStringParameters?.userId;
       
-      if (!userId || userId === 'profile') {
+      if (!userId || userId === 'api-user-profile') {
         return {
           statusCode: 400,
           headers,
