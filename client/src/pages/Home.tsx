@@ -26,7 +26,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sparkles, Share2, Crown, Wand2, Settings, Stars, Zap, Calendar, Gem, LogIn, LogOut, User } from "lucide-react";
+import { Sparkles, Share2, Crown, Wand2, Settings, Stars, Zap, Calendar, Gem, LogIn, LogOut, User, Info, X, ChevronRight, Award, Heart } from "lucide-react";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || "");
 
@@ -59,6 +59,9 @@ export default function Home() {
   const [tarotQuestion, setTarotQuestion] = useState("");
   const [showTarotDialog, setShowTarotDialog] = useState(false);
   const [tarotQuestionInput, setTarotQuestionInput] = useState("");
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [profileBannerDismissed, setProfileBannerDismissed] = useState(false);
   const { toast } = useToast();
   const { t, language } = useLanguage();
 
@@ -178,7 +181,29 @@ export default function Home() {
       });
       window.history.replaceState({}, "", "/");
     }
+    
+    // Check if this is first visit
+    const hasSeenWelcome = localStorage.getItem("manifestly-seen-welcome");
+    if (!hasSeenWelcome) {
+      setTimeout(() => setShowWelcomeModal(true), 1000);
+      localStorage.setItem("manifestly-seen-welcome", "true");
+    }
   }, [toast, t, isAuthenticated, user]);
+  
+  // Fetch user profile
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!userId) return;
+      try {
+        const response = await fetch(`/api/user/profile/${userId}`);
+        const data = await response.json();
+        setUserProfile(data);
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      }
+    };
+    fetchUserProfile();
+  }, [userId]);
 
   // Auto-translate tarot reading when language changes
   useEffect(() => {
@@ -224,6 +249,16 @@ export default function Home() {
 
     translateTarotReading();
   }, [language, userId]);
+  
+  // Profile completion helpers
+  const isProfileComplete = userProfile?.birthDate && userProfile?.horoscopePreferences?.length > 0;
+  const activeSystems = userProfile?.horoscopePreferences?.length || 0;
+  const hasReligion = !!userProfile?.religion && userProfile?.religion !== "None";
+  const profileCompletionPercentage = Math.round(
+    ((userProfile?.birthDate ? 33 : 0) +
+    (userProfile?.horoscopePreferences?.length > 0 ? 34 : 0) +
+    (userProfile?.religion && userProfile?.religion !== "None" ? 33 : 0))
+  );
 
   const handleEmotionalSubmit = async (feeling: string) => {
     if (!userId) {
@@ -557,6 +592,31 @@ export default function Home() {
               <Gem className="w-4 h-4 text-primary" />
               <span className="text-sm font-semibold text-foreground">{isPremium ? "∞" : soulGems}</span>
             </button>
+            
+            {/* Active Systems Badge */}
+            {activeSystems > 0 && (
+              <button
+                onClick={() => setLocation("/profile")}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-colors cursor-pointer"
+                title={`${activeSystems} astrology systems active`}
+              >
+                <Stars className="w-4 h-4 text-purple-500" />
+                <span className="text-xs font-semibold text-foreground">{activeSystems}x</span>
+              </button>
+            )}
+            
+            {/* Religion Badge */}
+            {hasReligion && (
+              <button
+                onClick={() => setLocation("/profile")}
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 hover:bg-green-500/20 transition-colors cursor-pointer"
+                title={`${userProfile.religion} wisdom integrated`}
+              >
+                <Heart className="w-4 h-4 text-green-500" />
+                <span className="text-xs font-semibold text-foreground">{userProfile.religion}</span>
+              </button>
+            )}
+            
             <Button
               variant="ghost"
               size="icon"
@@ -595,6 +655,68 @@ export default function Home() {
       </header>
 
       <main className="container mx-auto px-4 py-8 md:py-16">
+        {/* Profile Setup Banner */}
+        {!isProfileComplete && !profileBannerDismissed && (
+          <div className="max-w-4xl mx-auto mb-8 relative">
+            <div className="p-5 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-amber-500/10 border border-purple-500/30 rounded-xl shadow-lg backdrop-blur-sm">
+              <button
+                onClick={() => setProfileBannerDismissed(true)}
+                className="absolute top-3 right-3 p-1 rounded-full hover:bg-background/50 transition-colors"
+              >
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+              
+              <div className="flex flex-col md:flex-row items-start gap-4">
+                <div className="p-3 rounded-full bg-purple-500/20">
+                  <Award className="w-8 h-8 text-purple-500" />
+                </div>
+                
+                <div className="flex-1 space-y-3">
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground mb-1">
+                      ✨ Unlock Ultra-Personalized Cosmic Readings
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Get messages powered by <strong>6 astrology systems</strong> (Western, Vedic, Chinese Bazi, Thai Lanna, Japanese, Korean Saju) + your spiritual path
+                    </p>
+                  </div>
+                  
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex-1 min-w-[200px]">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                        <span>Profile Completion</span>
+                        <span className="font-semibold">{profileCompletionPercentage}%</span>
+                      </div>
+                      <div className="h-2 bg-background/50 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
+                          style={{ width: `${profileCompletionPercentage}%` }}
+                        />
+                      </div>
+                    </div>
+                    
+                    <Button
+                      size="sm"
+                      onClick={() => setLocation("/profile")}
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                    >
+                      <User className="w-4 h-4 mr-2" />
+                      Complete Setup (2 min)
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
+                  </div>
+                  
+                  {activeSystems > 0 && (
+                    <p className="text-xs text-green-600 dark:text-green-400 font-semibold">
+                      ✓ {activeSystems} {activeSystems === 1 ? 'system' : 'systems'} already active! {hasReligion && `✓ ${userProfile.religion} wisdom enabled!`}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {mode === "input" && (
           <div className="max-w-4xl mx-auto space-y-12">
             <div className="text-center space-y-4">
@@ -841,7 +963,12 @@ export default function Home() {
 
         {mode === "message" && (
           <div className="max-w-4xl mx-auto space-y-8">
-            <EnergyCard message={currentMessage} emotion={currentEmotion} />
+            <EnergyCard 
+              message={currentMessage} 
+              emotion={currentEmotion}
+              activeSystems={userProfile?.horoscopePreferences || []}
+              religion={userProfile?.religion}
+            />
 
             <div className="flex flex-wrap gap-4 justify-center">
               <Button
@@ -923,7 +1050,132 @@ export default function Home() {
         isOpen={shareModal}
         onClose={() => setShareModal(false)}
         message={currentMessage}
+        activeSystems={userProfile?.horoscopePreferences || []}
+        religion={userProfile?.religion}
       />
+      
+      {/* Welcome Modal - First Visit */}
+      <Dialog open={showWelcomeModal} onOpenChange={setShowWelcomeModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-serif flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-primary" />
+              Welcome to Soullec - The World's Most Personalized Astrology App
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <p className="text-muted-foreground">
+              Unlike other apps that only offer Western astrology, Soullec combines <strong>6 ancient wisdom traditions</strong> to create readings that feel impossibly personal:
+            </p>
+            
+            <div className="grid md:grid-cols-2 gap-3">
+              <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                <div className="flex items-start gap-2">
+                  <Stars className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Western Zodiac</h4>
+                    <p className="text-xs text-muted-foreground">Sun signs, elements, planets</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                <div className="flex items-start gap-2">
+                  <Stars className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Vedic Astrology</h4>
+                    <p className="text-xs text-muted-foreground">27 Nakshatras, Moon signs</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                <div className="flex items-start gap-2">
+                  <Stars className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Chinese Bazi</h4>
+                    <p className="text-xs text-muted-foreground">Four Pillars of Destiny</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                <div className="flex items-start gap-2">
+                  <Stars className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Thai Lanna</h4>
+                    <p className="text-xs text-muted-foreground">Weekday deities & animals</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-3 rounded-lg bg-pink-500/10 border border-pink-500/20">
+                <div className="flex items-start gap-2">
+                  <Stars className="w-5 h-5 text-pink-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Japanese</h4>
+                    <p className="text-xs text-muted-foreground">Animal years, blood types</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                <div className="flex items-start gap-2">
+                  <Stars className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Korean Saju</h4>
+                    <p className="text-xs text-muted-foreground">사주 Four Pillars</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-4 rounded-lg bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20">
+              <div className="flex items-start gap-2">
+                <Heart className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-sm mb-1">Faith-Friendly Spirituality</h4>
+                  <p className="text-xs text-muted-foreground">
+                    We honor your spiritual path - whether Christian, Muslim, Buddhist, Hindu, or any tradition. 
+                    Your readings can incorporate wisdom from your faith.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-center">
+              <p className="text-sm font-semibold text-foreground mb-2">
+                🎁 You get <strong>1 FREE reading</strong> to try it out!
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Set up your cosmic profile to unlock ultra-personalized readings that combine all these systems.
+              </p>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowWelcomeModal(false)}
+              className="w-full sm:w-auto"
+            >
+              Try Basic Reading First
+            </Button>
+            <Button
+              onClick={() => {
+                setShowWelcomeModal(false);
+                setLocation("/profile");
+              }}
+              className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+            >
+              <Award className="w-4 h-4 mr-2" />
+              Set Up My Cosmic Profile
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
