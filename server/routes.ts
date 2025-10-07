@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
-import { storage } from "./storage";
+import { storage } from "./supabaseStorage";
 import { detectEmotion, generateBarnumMessage, generateAffirmation, generateDailyHoroscope, generateTarotReading } from "./openai";
 import { calculateHoroscope, formatHoroscopeContext } from "./horoscope";
 import { drawCards } from "./tarot";

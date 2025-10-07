@@ -44,11 +44,11 @@ class PostgresStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const result = await this.db.insert(users).values(insertUser).returning();
-    return result[0];
+    return result[0] as User;
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    const [user] = await this.db
+    const result = await this.db
       .insert(users)
       .values(userData)
       .onConflictDoUpdate({
@@ -59,7 +59,7 @@ class PostgresStorage implements IStorage {
         },
       })
       .returning();
-    return user;
+    return result[0] as User;
   }
 
   async linkAnonymousToAuthenticated(anonymousId: string, authenticatedId: string): Promise<User | undefined> {
