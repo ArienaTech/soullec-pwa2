@@ -1,0 +1,135 @@
+Build a mobile-first PWA called Manifestly, an AI-powered manifestation app that monetizes the Barnum effect. Users receive emotionally personalized “divine” insights that feel unique and true, with instant upsells and shareable outputs.
+
+
+---
+
+Functional Requirements
+
+1. Core Flow
+
+Landing page → “What are you feeling today?” text input.
+
+On submit → AI generates a Barnum-style message (using OpenAI API).
+
+Display as an animated “Energy Card” (smooth fade-in, calm gradient).
+
+Add CTA buttons:
+
+🔮 “Reveal Deeper Insight” → triggers Stripe $1.99 checkout
+
+💎 “Unlock Unlimited Readings” → Stripe $9.99/month subscription
+
+📤 “Share My Message” → generates an auto-formatted quote image (with app watermark + background gradient)
+
+
+
+2. Manifestation Mode
+
+User types a desire or goal.
+
+AI converts it into a 3-sentence affirmation (present-tense, cinematic).
+
+Option to play gentle background music (use royalty-free loop).
+
+
+3. Emotional Hook Engine
+
+Detect emotion in user text (“lost”, “in love”, “stressed”, “hopeful”)
+
+Tailor response tone accordingly (calming, empowering, romantic, etc.).
+
+
+4. Monetization
+
+Stripe integration:
+
+One-time purchase ($1.99)
+
+Subscription ($9.99/month)
+
+
+Store purchases in Supabase table payments with userId + type + timestamp.
+
+
+5. Database (Supabase)
+
+users: id, email (optional), subscriptionStatus
+
+messages: id, userId, input, aiResponse, emotion, timestamp
+
+payments: id, userId, amount, type, timestamp
+
+
+6. Viral Growth
+
+“Share my message” → creates an image (quote + gradient background + watermark “✨ Manifestly”) ready for TikTok/Instagram.
+
+Add “streak badge” counter (number of consecutive days user engaged).
+
+
+
+---
+
+UI / UX Requirements
+
+Framework: Next.js + Tailwind
+
+Theme: minimalist, soft gradients (lavender, cosmic blue, pink glow)
+
+Typography: serif or handwritten (like Playfair Display / Dancing Script)
+
+Components:
+
+Hero section with CTA “Get Your Daily Message”
+
+Chat-style input and response area
+
+Payment modal
+
+Profile/streak screen
+
+Share modal
+
+
+
+
+---
+
+AI Logic
+
+Prompt for message generation:
+
+> You are a mystical guide who delivers emotionally resonant insights. Write a short 3-sentence message that sounds divinely inspired but universally relatable. It should feel as if written personally for the user. Use warm, poetic language.
+
+
+
+Prompt for manifestation mode:
+
+> Turn the user’s desire into a 3-sentence affirmation written in present tense, filled with gratitude and certainty.
+
+
+
+
+---
+
+Backend Logic
+
+Use OpenAI API (GPT-5) for message generation.
+
+Store user interactions in Supabase.
+
+Use Stripe Checkout for payments (test + live keys).
+
+After purchase → unlock premium mode (unlimited messages + affirmations).
+
+
+
+---
+
+Post-Build QA Checklist
+
+✅ Mobile responsiveness tested
+✅ Stripe sandbox mode verified
+✅ Share image exports properly
+✅ AI latency < 2s average
+✅ All texts editable from constants file
