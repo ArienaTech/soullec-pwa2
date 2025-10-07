@@ -9,6 +9,12 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# Test function
+[[redirects]]
+  from = "/api/test"
+  to = "/.netlify/functions/test"
+  status = 200
+
 # API routes go to Netlify Functions (specific mappings)
 [[redirects]]
   from = "/api/user/session"
