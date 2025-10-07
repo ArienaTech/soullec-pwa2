@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import type { TarotReading } from "./tarot";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPEN_AI_API });
 
 interface EmotionAnalysis {
   emotion: string;

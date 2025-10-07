@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { users, messages, payments, type User, type InsertUser, type UpsertUser, type Message, type InsertMessage, type Payment, type InsertPayment } from "@shared/schema";
+import { users, messages, payments, type User, type InsertUser, type UpsertUser, type Message, type InsertMessage, type Payment, type InsertPayment } from "../../server/lib/schema";
 import { randomUUID } from "crypto";
 import { eq, sql } from "drizzle-orm";
 

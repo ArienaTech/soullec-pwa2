@@ -12,8 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/lib/use-toast";
+import { useAuth } from "@/lib/useAuth";
 import { ArrowLeft, Save, Sparkles, Crown, LogIn } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useLanguage } from "@/contexts/LanguageContext";
