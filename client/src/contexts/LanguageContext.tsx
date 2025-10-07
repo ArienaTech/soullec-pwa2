@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { translations, Language, TranslationKey } from "@/i18n/translations";
+import { translations, Language, TranslationKey } from "@shared/translations";
 
 interface LanguageContextType {
   language: Language;
@@ -24,7 +24,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   const t = (key: TranslationKey): string => {
-    return translations[language][key] || translations.en[key] || key;
+    const langTranslations = translations[language] as any;
+    const enTranslations = translations.en as any;
+    return langTranslations[key] || enTranslations[key] || key;
   };
 
   return (
