@@ -150,12 +150,25 @@ export default function Gems() {
     try {
       const response = await apiRequest("POST", "/api/payments/gems", {
         userId,
-        tier,
+        gemPackage: tier,
       });
       const data = await response.json();
 
+      if (data.paymentUnavailable) {
+        toast({
+          title: "Payment Coming Soon",
+          description: "Payment functionality is being set up. Please check back later!",
+          variant: "default",
+        });
+        setIsProcessing({ ...isProcessing, [tier]: false });
+        return;
+      }
+
       if (data.url) {
         window.location.href = data.url;
+      } else if (data.clientSecret) {
+        // Handle Stripe payment intent
+        setLocation(`/checkout?client_secret=${data.clientSecret}`);
       } else {
         throw new Error("No checkout URL received");
       }
@@ -186,6 +199,16 @@ export default function Gems() {
         userId,
       });
       const data = await response.json();
+
+      if (data.paymentUnavailable) {
+        toast({
+          title: "Subscription Coming Soon",
+          description: "Subscription functionality is being set up. Please check back later!",
+          variant: "default",
+        });
+        setIsProcessing({ ...isProcessing, subscription: false });
+        return;
+      }
 
       if (data.url) {
         window.location.href = data.url;

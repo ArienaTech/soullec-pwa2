@@ -8,13 +8,13 @@ import { drawCards } from "./tarot";
 import { insertMessageSchema, insertPaymentSchema } from "@shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+// Stripe is optional - only initialize if key is provided
+let stripe: Stripe | null = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2025-09-30.clover",
+  });
 }
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-09-30.clover",
-});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Replit Auth
@@ -622,6 +622,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create Soul Gems purchase payment intent
   app.post("/api/payments/gems", async (req, res) => {
     try {
+      if (!stripe) {
+        return res.status(503).json({ 
+          message: "Payment functionality is temporarily unavailable. Please contact support for payment options.",
+          paymentUnavailable: true
+        });
+      }
+
       const { userId, gemPackage } = req.body;
       
       if (!userId || !gemPackage) {
@@ -661,6 +668,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create subscription checkout ($9.99/month)
   app.post("/api/payments/subscription", async (req, res) => {
     try {
+      if (!stripe) {
+        return res.status(503).json({ 
+          message: "Subscription functionality is temporarily unavailable. Please contact support for subscription options.",
+          paymentUnavailable: true
+        });
+      }
+
       const { userId, email } = req.body;
       
       if (!userId) {
@@ -717,6 +731,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Stripe webhook handler
   app.post("/api/webhooks/stripe", async (req, res) => {
+    if (!stripe) {
+      return res.status(503).json({ message: "Stripe webhooks not configured" });
+    }
+
     const sig = req.headers['stripe-signature'] as string;
     
     try {

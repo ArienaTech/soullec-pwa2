@@ -8,7 +8,9 @@ import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { Sparkles, ArrowLeft } from "lucide-react";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || "");
+const stripePromise = import.meta.env.VITE_STRIPE_PUBLIC_KEY 
+  ? loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY) 
+  : null;
 
 function CheckoutForm() {
   const stripe = useStripe();
@@ -146,9 +148,29 @@ export default function Checkout() {
           </div>
 
           <Card className="p-6">
-            <Elements stripe={stripePromise} options={{ clientSecret }}>
-              <CheckoutForm />
-            </Elements>
+            {stripePromise ? (
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <CheckoutForm />
+              </Elements>
+            ) : (
+              <div className="text-center space-y-4">
+                <div className="text-yellow-600 dark:text-yellow-400">
+                  <Sparkles className="w-12 h-12 mx-auto mb-2" />
+                  <h3 className="text-lg font-semibold">Payment Coming Soon</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Payment functionality is being set up. Please check back later or contact support for assistance.
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => window.history.back()} 
+                  variant="outline" 
+                  className="w-full"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Go Back
+                </Button>
+              </div>
+            )}
           </Card>
         </div>
       </main>

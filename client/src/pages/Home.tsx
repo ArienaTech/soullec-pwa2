@@ -28,7 +28,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sparkles, Share2, Crown, Wand2, Settings, Stars, Zap, Calendar, Gem, LogIn, LogOut, User } from "lucide-react";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || "");
+const stripePromise = import.meta.env.VITE_STRIPE_PUBLIC_KEY 
+  ? loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY) 
+  : null;
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -431,6 +433,77 @@ export default function Home() {
     }
   };
 
+  // Standalone Horoscope reading2 function - works without server
+  const handleHoroscopeReading2 = () => {
+    setLoadingHoroscope(true);
+
+    // Simulate loading for better UX
+    setTimeout(() => {
+      // Generate a client-side horoscope based on current date and time
+      const today = new Date();
+      const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000);
+      const month = today.getMonth();
+      const day = today.getDate();
+      
+      // Simple horoscope generation based on date
+      const horoscopes = [
+        "The stars align to bring you clarity and wisdom this month. Trust your intuition as it guides you toward new opportunities for growth. A significant decision awaits, and your inner wisdom holds the key.",
+        
+        "This month brings powerful transformation energy. Embrace change as your ally, for it carries the seeds of your greatest achievements. Your creativity is especially heightened now - use it wisely.",
+        
+        "The universe whispers secrets of abundance to those who listen. Focus on gratitude and watch as new blessings flow into your life. A meaningful connection may surprise you this month.",
+        
+        "Your spiritual journey takes a beautiful turn this month. Ancient wisdom surfaces to guide your path. Pay attention to dreams and synchronicities - they carry important messages.",
+        
+        "The cosmic winds favor bold action and new beginnings. Step out of your comfort zone with confidence. The universe supports your authentic self-expression now more than ever.",
+        
+        "This month illuminates hidden talents and dormant potentials within you. Trust in your unique gifts and share them with the world. Recognition and appreciation are on their way.",
+        
+        "The celestial energies encourage deep healing and emotional renewal. Release what no longer serves you and make space for miracles. Your heart is opening to greater love and compassion.",
+        
+        "Adventure and discovery await you this month. Whether through travel, learning, or meeting new people, expansion is your theme. Stay curious and open to unexpected opportunities.",
+        
+        "The stars highlight your natural leadership abilities. Others look to you for guidance and inspiration. Step into your power with grace and use your influence for positive change.",
+        
+        "This month brings a harmonious blend of material and spiritual success. Your efforts are bearing fruit in ways you may not yet see. Trust the process and maintain your positive momentum.",
+        
+        "The universe calls you to be a beacon of light for others. Your words and actions have special power to heal and inspire now. Share your wisdom generously and watch it multiply.",
+        
+        "A cycle of completion and new beginnings unfolds this month. What you've been working toward is ready to manifest. Prepare for a beautiful harvest of your efforts and intentions."
+      ];
+      
+      // Select horoscope based on date for consistency
+      const horoscopeIndex = (dayOfYear + month + day) % horoscopes.length;
+      const selectedHoroscope = horoscopes[horoscopeIndex];
+      
+      // Add personalized elements based on current time
+      const hour = today.getHours();
+      let timeMessage = "";
+      
+      if (hour < 6) {
+        timeMessage = " The pre-dawn hours amplify your connection to divine guidance.";
+      } else if (hour < 12) {
+        timeMessage = " Morning energy brings fresh perspectives and new possibilities.";
+      } else if (hour < 18) {
+        timeMessage = " The afternoon sun illuminates the path to your highest potential.";
+      } else {
+        timeMessage = " Evening's gentle energy supports reflection and inner wisdom.";
+      }
+      
+      const fullHoroscope = selectedHoroscope + timeMessage + 
+        "\n\n✨ Remember: You have the power to create your own destiny. Use this guidance as inspiration for your journey.";
+      
+      setDailyHoroscope(fullHoroscope);
+      setLastHoroscopePeriod("monthly");
+      setLoadingHoroscope(false);
+      
+      toast({
+        title: "🔮 Horoscope reading2 Complete!",
+        description: "Your personalized cosmic guidance is ready.",
+      });
+    }, 2000); // 2 second delay for realistic feel
+  };
+
   const handleTarotDialogOpen = () => {
     if (!userId) {
       toast({
@@ -634,6 +707,17 @@ export default function Home() {
               >
                 <Stars className="w-5 h-5 mr-2" />
                 {loadingHoroscope ? t("readingStars") : t("horoscopeReading")}
+              </Button>
+
+              <Button
+                onClick={handleHoroscopeReading2}
+                variant="secondary"
+                className="h-12 px-8"
+                disabled={loadingHoroscope}
+                data-testid="button-horoscope-reading2"
+              >
+                <Calendar className="w-5 h-5 mr-2" />
+                {loadingHoroscope ? "Reading Stars..." : "Horoscope reading2"}
               </Button>
 
               <Button
