@@ -433,6 +433,95 @@ export default function Home() {
     }
   };
 
+  // New Horoscope reading2 function
+  const handleHoroscopeReading2 = async () => {
+    if (!userId) {
+      toast({
+        title: t("error"),
+        description: t("sessionNotInitialized"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (soulGems < 1 && !isPremium) {
+      toast({
+        title: t("insufficientGems"),
+        description: t("needMoreGems"),
+        action: (
+          <Button variant="outline" size="sm" onClick={() => setLocation("/gems")}>
+            {t("getGems")}
+          </Button>
+        ),
+      });
+      return;
+    }
+
+    setLoadingHoroscope(true);
+
+    try {
+      const languageMap: Record<string, string> = {
+        en: "English",
+        es: "Spanish", 
+        pt: "Portuguese",
+        th: "Thai",
+        zh: "Chinese (Simplified)",
+        ja: "Japanese",
+        ko: "Korean",
+        fr: "French",
+        de: "German",
+        it: "Italian",
+        hi: "Hindi",
+      };
+      
+      const mappedLanguage = languageMap[uiLanguage] || "English";
+      
+      // Generate a monthly horoscope reading for variety
+      const response = await apiRequest("POST", "/api/horoscope/reading", { 
+        userId,
+        uiLanguage: mappedLanguage,
+        period: "monthly",
+        question: "What should I focus on this month for personal growth and spiritual development?",
+      });
+      const data = await response.json();
+
+      if (data.horoscope) {
+        setDailyHoroscope(data.horoscope);
+        setLastHoroscopePeriod("monthly");
+        if (typeof data.soulGems === 'number') {
+          setSoulGems(data.soulGems);
+        }
+        
+        toast({
+          title: "✨ Monthly Horoscope Generated!",
+          description: "Your personalized monthly guidance is ready.",
+        });
+      } else {
+        throw new Error(data.message || "Failed to generate horoscope");
+      }
+    } catch (error: any) {
+      if (error.message?.includes("birth info")) {
+        toast({
+          title: t("setupRequired"),
+          description: t("setupRequiredDesc"),
+          action: (
+            <Button variant="outline" size="sm" onClick={() => setLocation("/profile")}>
+              {t("goToProfile")}
+            </Button>
+          ),
+        });
+      } else {
+        toast({
+          title: t("error"),
+          description: error.message || t("horoscopeGenerationFailed"),
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setLoadingHoroscope(false);
+    }
+  };
+
   const handleTarotDialogOpen = () => {
     if (!userId) {
       toast({
@@ -636,6 +725,17 @@ export default function Home() {
               >
                 <Stars className="w-5 h-5 mr-2" />
                 {loadingHoroscope ? t("readingStars") : t("horoscopeReading")}
+              </Button>
+
+              <Button
+                onClick={handleHoroscopeReading2}
+                variant="secondary"
+                className="h-12 px-8"
+                disabled={loadingHoroscope}
+                data-testid="button-horoscope-reading2"
+              >
+                <Calendar className="w-5 h-5 mr-2" />
+                {loadingHoroscope ? "Reading Stars..." : "Horoscope reading2"}
               </Button>
 
               <Button
