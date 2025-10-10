@@ -1,5 +1,4 @@
 import OpenAI from "openai";
-import type { TarotReading } from "./tarot";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -15,11 +14,6 @@ interface MessageResponse {
 
 interface AffirmationResponse {
   affirmation: string;
-}
-
-interface TarotInterpretation {
-  reading: string;
-  advice: string;
 }
 
 export async function detectEmotion(text: string): Promise<EmotionAnalysis> {
@@ -271,117 +265,4 @@ Make them think "how did they know?"`;
     console.error("Horoscope generation error:", error);
     throw new Error("Failed to generate horoscope: " + error.message);
   }
-}
-
-export async function generateTarotReading(
-  tarotReading: TarotReading,
-  question: string,
-  religion?: string,
-  language: string = "English"
-): Promise<TarotInterpretation> {
-  try {
-    const cardsDescription = tarotReading.cards.map(({ card, position, reversed }) => 
-      `Position "${position}": ${card.name}${reversed ? " (Reversed)" : ""} - ${reversed ? card.reversedMeaning : card.uprightMeaning}`
-    ).join('\n');
-
-    let systemContent = `You are a mystical tarot reader with deep knowledge of symbolism, archetypes, and the human psyche. You provide profound, personalized interpretations that feel like they speak directly to the querent's soul.
-
-GUIDELINES:
-1. DIRECTLY ADDRESS the querent's question - your reading must provide clear insights and answers to what they've asked
-2. Weave the cards together into a cohesive narrative that tells the querent's story
-3. Reference specific symbols and imagery from the cards as they relate to the question
-4. Connect the card positions (Past, Present, Future, etc.) to create a flowing reading that answers their query
-5. Be specific and actionable - avoid generic platitudes
-6. Acknowledge both light and shadow aspects relevant to their question
-7. Provide empowering, practical guidance that helps them take action on their question`;
-
-    if (religion) {
-      systemContent += `\n\nSPIRITUAL BACKGROUND: They practice ${religion}. When interpreting the cards, if there's wisdom from their faith tradition that genuinely relates to what the cards are showing, weave it in naturally - a relevant teaching, scripture, or concept that adds depth to the reading.`;
-    }
-
-    systemContent += `\n\nLANGUAGE: Write your ENTIRE response in ${language}. Use natural, mystical ${language} that feels authentic and profound. All content must be in ${language}.
-
-You must respond with a JSON object containing two fields:
-- "reading": 250-350 words for the main interpretation that answers their question
-- "advice": 50-80 words of practical advice specific to their situation
-
-Write both fields in mystical yet accessible ${language}, deeply personal and resonant to their specific query.`;
-
-    const userContent = `Question: "${question}"
-
-Cards Drawn:
-${cardsDescription}
-
-Spread: ${tarotReading.spread}
-
-Provide a profound tarot reading in JSON format that directly answers the querent's question. Write completely in ${language}.`;
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: systemContent,
-        },
-        {
-          role: "user",
-          content: userContent,
-        },
-      ],
-      temperature: 0.9,
-      max_tokens: 600,
-      response_format: { type: "json_object" },
-    });
-
-    const fullResponse = response.choices[0].message.content || '{}';
-    const parsed = JSON.parse(fullResponse);
-    
-    const reading = parsed.reading || getDefaultReading(language);
-    const advice = parsed.advice || getDefaultAdvice(language);
-
-    return {
-      reading,
-      advice
-    };
-  } catch (error: any) {
-    console.error("Tarot reading error:", error);
-    return {
-      reading: getDefaultReading(language),
-      advice: getDefaultAdvice(language)
-    };
-  }
-}
-
-function getDefaultReading(language: string): string {
-  const readings: Record<string, string> = {
-    "English": "The cards speak softly today. Trust what your heart already knows.",
-    "Spanish": "Las cartas hablan suavemente hoy. Confía en lo que tu corazón ya sabe.",
-    "Portuguese": "As cartas falam suavemente hoje. Confie no que seu coração já sabe.",
-    "Thai": "ไพ่กำลังพูดเบาๆ วันนี้ ไว้วางใจในสิ่งที่หัวใจคุณรู้อยู่แล้ว",
-    "Chinese (Simplified)": "今天牌在轻声诉说。相信你内心已经知道的。",
-    "Japanese": "今日カードは静かに語っています。あなたの心がすでに知っていることを信じてください。",
-    "Korean": "오늘 카드가 부드럽게 말하고 있습니다. 당신의 마음이 이미 알고 있는 것을 믿으세요.",
-    "French": "Les cartes parlent doucement aujourd'hui. Faites confiance à ce que votre cœur sait déjà.",
-    "German": "Die Karten sprechen heute leise. Vertraue auf das, was dein Herz bereits weiß.",
-    "Italian": "Le carte parlano dolcemente oggi. Fidati di ciò che il tuo cuore già sa.",
-    "Hindi": "आज कार्ड धीरे से बोल रहे हैं। अपने दिल की बात पर भरोसा करें जो वह पहले से जानता है।"
-  };
-  return readings[language] || readings["English"];
-}
-
-function getDefaultAdvice(language: string): string {
-  const advice: Record<string, string> = {
-    "English": "Trust the wisdom the cards have revealed. Take one small step forward today.",
-    "Spanish": "Confía en la sabiduría que las cartas han revelado. Da un pequeño paso adelante hoy.",
-    "Portuguese": "Confie na sabedoria que as cartas revelaram. Dê um pequeno passo à frente hoje.",
-    "Thai": "เชื่อในภูมิปัญญาที่ไพ่เผยให้เห็น ก้าวเล็กๆ ไปข้างหน้าวันนี้",
-    "Chinese (Simplified)": "相信牌所揭示的智慧。今天向前迈出一小步。",
-    "Japanese": "カードが明らかにした知恵を信じてください。今日、小さな一歩を踏み出しましょう。",
-    "Korean": "카드가 드러낸 지혜를 믿으세요. 오늘 작은 한 걸음을 내디디세요.",
-    "French": "Faites confiance à la sagesse que les cartes ont révélée. Faites un petit pas en avant aujourd'hui.",
-    "German": "Vertraue auf die Weisheit, die die Karten offenbart haben. Mache heute einen kleinen Schritt nach vorne.",
-    "Italian": "Fidati della saggezza che le carte hanno rivelato. Fai un piccolo passo avanti oggi.",
-    "Hindi": "कार्डों द्वारा प्रकट की गई बुद्धि पर विश्वास करें। आज एक छोटा कदम आगे बढ़ाएं।"
-  };
-  return advice[language] || advice["English"];
 }

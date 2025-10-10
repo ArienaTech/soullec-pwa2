@@ -2,19 +2,17 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./supabaseStorage";
-import { detectEmotion, generateBarnumMessage, generateAffirmation, generateDailyHoroscope, generateTarotReading } from "./openai";
+import { detectEmotion, generateBarnumMessage, generateAffirmation, generateDailyHoroscope } from "./openai";
 import { calculateHoroscope, formatHoroscopeContext } from "./horoscope";
-import { drawCards } from "./tarot";
 import { insertMessageSchema, insertPaymentSchema } from "@shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-09-30.clover",
-});
+// Initialize Stripe only if key is provided
+const stripe = process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.startsWith('sk_')
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2025-09-30.clover",
+    })
+  : null;
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Replit Auth
@@ -303,89 +301,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Get profile error:", error);
       res.status(500).json({ message: "Error getting profile: " + error.message });
-    }
-  });
-
-  // Generate tarot reading
-  app.post("/api/tarot/reading", async (req, res) => {
-    try {
-      const { question, userId, uiLanguage, numCards = 3 } = req.body;
-      
-      if (!question || !userId) {
-        return res.status(400).json({ message: "Missing required fields" });
-      }
-
-      // Check Soul Gems balance
-      const soulGems = await storage.getSoulGems(userId);
-      if (soulGems < 1) {
-        return res.status(403).json({ 
-          message: "Insufficient Soul Gems",
-          soulGems: 0
-        });
-      }
-
-      const user = await storage.getUser(userId);
-      
-      const tarotReading = {
-        cards: drawCards(numCards),
-        spread: numCards === 1 ? "Single Card" : numCards === 3 ? "Past-Present-Future" : "Five Card Spread",
-        question
-      };
-
-      const language = uiLanguage || "English";
-      const interpretation = await generateTarotReading(tarotReading, question, user?.religion || undefined, language);
-
-      const insertData = insertMessageSchema.parse({
-        userId,
-        input: question,
-        aiResponse: `${interpretation.reading}\n\nAdvice: ${interpretation.advice}`,
-        type: "tarot",
-      });
-
-      const savedMessage = await storage.createMessage(insertData);
-
-      // Deduct 1 Soul Gem (atomic operation prevents double-spend)
-      const updatedUser = await storage.deductSoulGems(userId, 1);
-      if (!updatedUser) {
-        return res.status(403).json({ 
-          message: "Insufficient Soul Gems",
-          soulGems: 0
-        });
-      }
-
-      const remainingGems = await storage.getSoulGems(userId);
-
-      res.json({
-        ...interpretation,
-        cards: tarotReading.cards,
-        spread: tarotReading.spread,
-        messageId: savedMessage.id,
-        soulGems: remainingGems
-      });
-    } catch (error: any) {
-      console.error("Tarot reading error:", error);
-      res.status(500).json({ message: "Error generating tarot reading: " + error.message });
-    }
-  });
-
-  // Translate tarot reading to new language
-  app.post("/api/tarot/translate", async (req, res) => {
-    try {
-      const { question, cards, spread, uiLanguage, userId } = req.body;
-      
-      if (!question || !cards || !spread || !uiLanguage) {
-        return res.status(400).json({ message: "Missing required fields" });
-      }
-
-      const user = userId ? await storage.getUser(userId) : undefined;
-      const tarotReading = { cards, spread, question };
-      const language = uiLanguage || "English";
-      const interpretation = await generateTarotReading(tarotReading, question, user?.religion || undefined, language);
-
-      res.json(interpretation);
-    } catch (error: any) {
-      console.error("Tarot translation error:", error);
-      res.status(500).json({ message: "Error translating tarot reading: " + error.message });
     }
   });
 

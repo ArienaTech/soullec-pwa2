@@ -1,0 +1,29 @@
+[build]
+  command = "vite build"
+  publish = "dist/public"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/user/session"
+  to = "/.netlify/functions/user-session"
+  status = 200
+
+[[redirects]]
+  from = "/api/user/profile/*"
+  to = "/.netlify/functions/user-profile/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/user/profile"
+  to = "/.netlify/functions/user-profile"
+  status = 200
+
+[[redirects]]
+  from = "/api/messages/generate"
+  to = "/.netlify/functions/messages-generate"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE */
+/* LIGHT MODE - Warm Cream Theme */
 :root {
   --button-outline: rgba(0,0,0, .10);
   --badge-outline: rgba(0,0,0, .05);
@@ -14,49 +14,49 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  --background: 0 0% 98%;
+  --background: 48 20% 96%;
 
   --foreground: 270 15% 25%;
 
-  --border: 280 4% 88%;
+  --border: 45 15% 88%;
 
-  --card: 280 5% 96%;
+  --card: 48 18% 94%;
 
   --card-foreground: 270 15% 25%;
 
-  --card-border: 280 4% 92%;
+  --card-border: 45 15% 90%;
 
-  --sidebar: 280 6% 94%;
+  --sidebar: 48 18% 93%;
 
   --sidebar-foreground: 270 15% 25%;
 
-  --sidebar-border: 280 5% 89%;
+  --sidebar-border: 45 15% 88%;
 
   --sidebar-primary: 280 65% 65%;
 
   --sidebar-primary-foreground: 280 10% 98%;
 
-  --sidebar-accent: 280 8% 90%;
+  --sidebar-accent: 48 15% 90%;
 
   --sidebar-accent-foreground: 270 15% 30%;
 
   --sidebar-ring: 280 65% 65%;
 
-  --popover: 280 6% 92%;
+  --popover: 48 18% 92%;
 
   --popover-foreground: 270 15% 25%;
 
-  --popover-border: 280 5% 87%;
+  --popover-border: 45 15% 87%;
 
   --primary: 280 65% 65%;
 
   --primary-foreground: 280 10% 98%;
 
-  --secondary: 280 8% 88%;
+  --secondary: 48 15% 88%;
 
   --secondary-foreground: 270 15% 30%;
 
-  --muted: 280 7% 90%;
+  --muted: 48 12% 90%;
 
   --muted-foreground: 270 12% 45%;
 
