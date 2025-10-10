@@ -555,6 +555,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid gem package" });
       }
 
+      if (!stripe) {
+        return res.status(500).json({ message: "Payment system not configured" });
+      }
+
       const paymentIntent = await stripe.paymentIntents.create({
         amount: selectedPackage.amount,
         currency: "usd",
@@ -585,6 +589,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
+      }
+
+      if (!stripe) {
+        return res.status(500).json({ message: "Payment system not configured" });
       }
 
       let customerId = user.stripeCustomerId;
@@ -634,6 +642,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/webhooks/stripe", async (req, res) => {
     const sig = req.headers['stripe-signature'] as string;
     
+    if (!stripe) {
+      return res.status(500).json({ message: "Payment system not configured" });
+    }
+
     try {
       const event = stripe.webhooks.constructEvent(
         req.body,

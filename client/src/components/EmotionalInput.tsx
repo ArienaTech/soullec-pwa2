@@ -31,6 +31,7 @@ export default function EmotionalInput({ onSubmit, isLoading }: EmotionalInputPr
         disabled={isLoading || !feeling.trim()}
         className="w-full h-12 text-base"
         size="lg"
+        data-testid="button-reveal-message"
       >
         <Sparkles className="w-5 h-5 mr-2" />
         {isLoading ? "Generating..." : "Reveal My Message"}

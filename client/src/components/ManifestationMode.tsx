@@ -45,6 +45,7 @@ export default function ManifestationMode({
           disabled={isLoading || !desire.trim()}
           className="w-full h-12"
           size="lg"
+          data-testid="button-generate-affirmation"
         >
           <Wand2 className="w-5 h-5 mr-2" />
           {isLoading ? "Manifesting..." : "Generate Affirmation"}

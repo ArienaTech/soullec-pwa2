@@ -28,7 +28,7 @@ export default function LanguageSelector() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Select language">
+        <Button variant="ghost" size="icon" aria-label="Select language" data-testid="button-language-selector">
           <Globe className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
