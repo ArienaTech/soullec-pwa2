@@ -72,6 +72,7 @@ export default function PaymentModal({
           onClick={() => onCheckout(type)}
           size="lg"
           className="w-full"
+          data-testid="button-payment-checkout"
         >
           Continue to Checkout
         </Button>

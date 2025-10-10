@@ -108,7 +108,7 @@ export default function ShareModal({ isOpen, onClose, message, activeSystems = [
           </div>
 
           <div className="flex gap-2">
-            <Button onClick={handleCopyToClipboard} className="flex-1">
+            <Button onClick={handleCopyToClipboard} className="flex-1" data-testid="button-copy-share">
               <Share2 className="w-4 h-4 mr-2" />
               Copy with System Info
             </Button>

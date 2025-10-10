@@ -483,6 +483,7 @@ export default function Home() {
                 onClick={() => setLocation("/profile")}
                 className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-colors cursor-pointer"
                 title={`${activeSystems} astrology systems active`}
+                data-testid="button-active-systems"
               >
                 <Stars className="w-4 h-4 text-purple-500" />
                 <span className="text-xs font-semibold text-foreground">{activeSystems}x</span>
@@ -495,6 +496,7 @@ export default function Home() {
                 onClick={() => setLocation("/profile")}
                 className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 hover:bg-green-500/20 transition-colors cursor-pointer"
                 title={`${userProfile.religion} wisdom integrated`}
+                data-testid="button-religion-badge"
               >
                 <Heart className="w-4 h-4 text-green-500" />
                 <span className="text-xs font-semibold text-foreground">{userProfile.religion}</span>
@@ -546,6 +548,7 @@ export default function Home() {
               <button
                 onClick={() => setProfileBannerDismissed(true)}
                 className="absolute top-3 right-3 p-1 rounded-full hover:bg-background/50 transition-colors"
+                data-testid="button-dismiss-profile-banner"
               >
                 <X className="w-4 h-4 text-muted-foreground" />
               </button>
@@ -583,6 +586,7 @@ export default function Home() {
                       size="sm"
                       onClick={() => setLocation("/profile")}
                       className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                      data-testid="button-complete-setup"
                     >
                       <User className="w-4 h-4 mr-2" />
                       Complete Setup (2 min)
@@ -940,6 +944,7 @@ export default function Home() {
               variant="outline"
               onClick={() => setShowWelcomeModal(false)}
               className="w-full sm:w-auto"
+              data-testid="button-try-basic-reading"
             >
               Try Basic Reading First
             </Button>
@@ -949,6 +954,7 @@ export default function Home() {
                 setLocation("/profile");
               }}
               className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              data-testid="button-setup-cosmic-profile"
             >
               <Award className="w-4 h-4 mr-2" />
               Set Up My Cosmic Profile
