@@ -24,6 +24,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/horoscope/reading2"
+  to = "/.netlify/functions/horoscope-reading2"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

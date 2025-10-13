@@ -57,6 +57,15 @@ export default function Home() {
   const [horoscopeQuestion, setHoroscopeQuestion] = useState("");
   const [horoscopeDate, setHoroscopeDate] = useState("");
   const [lastHoroscopePeriod, setLastHoroscopePeriod] = useState<"daily" | "monthly" | "yearly" | "specific">("daily");
+  
+  // Horoscope Reading2 states
+  const [dailyHoroscope2, setDailyHoroscope2] = useState<string | null>(null);
+  const [loadingHoroscope2, setLoadingHoroscope2] = useState(false);
+  const [showHoroscopeDialog2, setShowHoroscopeDialog2] = useState(false);
+  const [horoscopePeriod2, setHoroscopePeriod2] = useState<"daily" | "monthly" | "yearly" | "specific">("daily");
+  const [horoscopeQuestion2, setHoroscopeQuestion2] = useState("");
+  const [horoscopeDate2, setHoroscopeDate2] = useState("");
+  const [lastHoroscopePeriod2, setLastHoroscopePeriod2] = useState<"daily" | "monthly" | "yearly" | "specific">("daily");
   const [userProfile, setUserProfile] = useState<any>(null);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [profileBannerDismissed, setProfileBannerDismissed] = useState(false);
@@ -339,6 +348,21 @@ export default function Home() {
     setHoroscopeDate("");
   };
 
+  const handleHoroscopeDialogOpen2 = () => {
+    if (!userId) {
+      toast({
+        title: t("error"),
+        description: t("sessionNotInitialized"),
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowHoroscopeDialog2(true);
+    setHoroscopeQuestion2("");
+    setHoroscopePeriod2("daily");
+    setHoroscopeDate2("");
+  };
+
   const handleGenerateHoroscope = async () => {
     if (!userId) {
       toast({
@@ -417,6 +441,87 @@ export default function Home() {
       }
     } finally {
       setLoadingHoroscope(false);
+    }
+  };
+
+  const handleGenerateHoroscope2 = async () => {
+    if (!userId) {
+      toast({
+        title: t("error"),
+        description: t("sessionNotInitialized"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (horoscopePeriod2 === "specific" && !horoscopeDate2) {
+      toast({
+        title: t("error"),
+        description: "Please select a date",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setShowHoroscopeDialog2(false);
+    setLoadingHoroscope2(true);
+
+    try {
+      const uiLanguage = localStorage.getItem("manifestly-ui-language") || "en";
+      const languageMap: Record<string, string> = {
+        en: "English",
+        es: "Spanish",
+        pt: "Portuguese",
+        th: "Thai",
+        zh: "Chinese (Simplified)",
+        ja: "Japanese",
+        ko: "Korean",
+        fr: "French",
+        de: "German",
+        it: "Italian",
+        hi: "Hindi",
+      };
+      
+      const mappedLanguage = languageMap[uiLanguage] || "English";
+      
+      const response = await apiRequest("POST", "/api/horoscope/reading2", { 
+        userId,
+        uiLanguage: mappedLanguage,
+        period: horoscopePeriod2,
+        question: horoscopeQuestion2 || undefined,
+        date: horoscopeDate2 || undefined,
+      });
+      const data = await response.json();
+
+      if (data.horoscope) {
+        setDailyHoroscope2(data.horoscope);
+        setLastHoroscopePeriod2(horoscopePeriod2);
+        if (typeof data.soulGems === 'number') {
+          setSoulGems(data.soulGems);
+        }
+      } else {
+        throw new Error(data.message || "Failed to generate horoscope");
+      }
+    } catch (error: any) {
+      if (error.message?.includes("birth info")) {
+        toast({
+          title: t("setupRequired"),
+          description: t("setupRequiredDesc"),
+          action: (
+            <Button variant="outline" size="sm" onClick={() => setLocation("/profile")}>
+              {t("goToProfile")}
+            </Button>
+          ),
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to generate horoscope",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setLoadingHoroscope2(false);
     }
   };
 
@@ -642,6 +747,17 @@ export default function Home() {
                 {loadingHoroscope ? t("readingStars") : t("horoscopeReading")}
               </Button>
 
+              <Button
+                onClick={handleHoroscopeDialogOpen2}
+                variant="outline"
+                className="h-12 px-8"
+                disabled={loadingHoroscope2}
+                data-testid="button-horoscope-reading2"
+              >
+                <Stars className="w-5 h-5 mr-2" />
+                {loadingHoroscope2 ? t("readingStars") : t("horoscopeReading2")}
+              </Button>
+
             </div>
 
             <Dialog open={showHoroscopeDialog} onOpenChange={setShowHoroscopeDialog}>
@@ -715,6 +831,77 @@ export default function Home() {
               </DialogContent>
             </Dialog>
 
+            <Dialog open={showHoroscopeDialog2} onOpenChange={setShowHoroscopeDialog2}>
+              <DialogContent data-testid="dialog-horoscope-reading2">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Stars className="w-5 h-5 text-primary" />
+                    {t("horoscopeReading2")}
+                  </DialogTitle>
+                  <DialogDescription>
+                    {t("horoscopeDialogDesc")}
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">{t("timePeriod")}</label>
+                    <Select value={horoscopePeriod2} onValueChange={(value: any) => setHoroscopePeriod2(value)}>
+                      <SelectTrigger data-testid="select-horoscope-period2">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">{t("periodDaily")}</SelectItem>
+                        <SelectItem value="monthly">{t("periodMonthly")}</SelectItem>
+                        <SelectItem value="yearly">{t("periodYearly")}</SelectItem>
+                        <SelectItem value="specific">{t("periodSpecific")}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {horoscopePeriod2 === "specific" && (
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">{t("selectDate")}</label>
+                      <Input
+                        type="date"
+                        value={horoscopeDate2}
+                        onChange={(e) => setHoroscopeDate2(e.target.value)}
+                        data-testid="input-horoscope-date2"
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">{t("questionOptional")}</label>
+                    <Textarea
+                      placeholder={t("horoscopeQuestionPlaceholder")}
+                      value={horoscopeQuestion2}
+                      onChange={(e) => setHoroscopeQuestion2(e.target.value)}
+                      className="min-h-24"
+                      data-testid="input-horoscope-question2"
+                    />
+                  </div>
+                </div>
+
+                <DialogFooter>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowHoroscopeDialog2(false)}
+                    data-testid="button-cancel-horoscope2"
+                  >
+                    {t("close")}
+                  </Button>
+                  <Button 
+                    onClick={handleGenerateHoroscope2}
+                    data-testid="button-generate-horoscope2"
+                  >
+                    <Stars className="w-4 h-4 mr-2" />
+                    {t("generateReading")}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
             {dailyHoroscope && (
               <div className="mt-8 p-6 bg-card border rounded-lg shadow-sm">
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
@@ -733,6 +920,30 @@ export default function Home() {
                   onClick={() => setDailyHoroscope(null)}
                   className="mt-4"
                   data-testid="button-close-horoscope"
+                >
+                  {t("close")}
+                </Button>
+              </div>
+            )}
+
+            {dailyHoroscope2 && (
+              <div className="mt-8 p-6 bg-card border rounded-lg shadow-sm">
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <Stars className="w-5 h-5 text-primary" />
+                  {lastHoroscopePeriod2 === "daily" && t("yourDailyHoroscope")} (2)
+                  {lastHoroscopePeriod2 === "monthly" && t("yourMonthlyHoroscope")} (2)
+                  {lastHoroscopePeriod2 === "yearly" && t("yourYearlyHoroscope")} (2)
+                  {lastHoroscopePeriod2 === "specific" && t("yourHoroscopeReading")} (2)
+                </h3>
+                <p className="text-foreground leading-relaxed whitespace-pre-wrap">
+                  {dailyHoroscope2}
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDailyHoroscope2(null)}
+                  className="mt-4"
+                  data-testid="button-close-horoscope2"
                 >
                   {t("close")}
                 </Button>
